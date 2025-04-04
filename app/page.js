@@ -3,6 +3,33 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FaStar, FaGem, FaHeart, FaLaptopCode, FaQuestion } from 'react-icons/fa';
 
+const spinningMessages = [
+  "Spinning... This could be your lucky compile!",
+  "Spinning... Will your code execute correctly?",
+  "Spinning... Debugging your luck!",
+  "Spinning... Optimizing for a win!",
+  "Spinning... Crossing fingers for no infinite loop!",
+  "Spinning... Are you a computer science genius?",
+  "Spinning... Hope you don't hit a bug!",
+  "Spinning... Will you make it past the first condition?",
+  "Spinning... 3, 2, 1... Success?",
+  "Spinning... Can you break the recursion?"
+];
+
+const gameOverMessages = [
+  "Oops! Looks like your code threw an error. Game Over!",
+  "Your algorithm failed... Better luck next time!",
+  "Looks like you hit a segmentation fault. Game Over!",
+  "Compile error! Try again!",
+  "This is the equivalent of a 404... Game Over!",
+  "You’ve been debugged... by failure.",
+  "Oops! Infinite loop... in the wrong direction. Game Over!",
+  "Game Over, but at least you didn't get caught in an endless recursion.",
+  "404: Success Not Found. Try again!",
+  "Better luck next time, your code ran out of retries!"
+];
+
+
 // Define symbols, including a computer science–themed symbol.
 const symbols = [
   { icon: <FaStar className="text-yellow-400" />, name: 'Star' },
@@ -123,7 +150,7 @@ const SlotMachine = () => {
     if (spinning || remainingRetries === 0) return;
     
     setSpinning(true);
-    setStatusMessage('Spinning...');
+    setStatusMessage(spinningMessages[Math.floor(Math.random() * spinningMessages.length)]);
     playSpinSound();
     
     // Calculate spin duration based on spinSound's duration (at least 1 second) multiplied by 800.
@@ -165,7 +192,7 @@ const SlotMachine = () => {
                 console.error('Game over sound error:', err)
               );
             }
-            setStatusMessage('Game Over');
+            setStatusMessage(gameOverMessages[Math.floor(Math.random() * gameOverMessages.length)]);
           } else {
             setStatusMessage('Try again?');
           }
