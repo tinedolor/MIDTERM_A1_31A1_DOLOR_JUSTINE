@@ -1,103 +1,300 @@
-import Image from "next/image";
+'use client';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { FaStar, FaGem, FaHeart, FaLaptopCode, FaQuestion } from 'react-icons/fa';
 
-export default function Home() {
+// Define symbols, including a computer science–themed symbol.
+const symbols = [
+  { icon: <FaStar className="text-yellow-400" />, name: 'Star' },
+  { icon: <FaGem className="text-blue-400" />, name: 'Gem' },
+  { icon: <FaHeart className="text-red-400" />, name: 'Heart' },
+  { icon: <FaLaptopCode className="text-green-400" />, name: 'Code' },
+  { icon: <FaQuestion className="text-red-400" />, name: 'Question' },
+];
+
+// Utility to get a random symbol.
+const getRandomSymbol = () => symbols[Math.floor(Math.random() * symbols.length)];
+
+// ----- Confetti Component -----
+// Renders animated confetti using Framer Motion.
+const Confetti = () => {
+  const pieces = new Array(30).fill(0);
+  const colors = ["#FFC700", "#FF0000", "#2E3192", "#41BBC7"];
+  
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+    <div className="fixed inset-0 pointer-events-none overflow-hidden">
+      {pieces.map((_, index) => {
+        const left = Math.random() * 100;
+        const delay = Math.random() * 0.5;
+        const duration = 2 + Math.random() * 2;
+        const size = 5 + Math.random() * 10;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        
+        return (
+          <motion.div
+            key={index}
+            className="absolute rounded-full"
+            initial={{ opacity: 0, y: -20, rotate: 0 }}
+            animate={{
+              opacity: [0, 1, 0],
+              y: [0, window.innerHeight * 1.2],
+              rotate: [0, 360]
+            }}
+            transition={{ duration, delay, ease: "easeInOut" }}
+            style={{
+              left: `${left}%`,
+              width: size,
+              height: size,
+              backgroundColor: color,
+            }}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        );
+      })}
     </div>
   );
-}
+};
+
+const SlotMachine = () => {
+  // Initialize reels with three random symbols.
+  const [reels, setReels] = useState([
+    getRandomSymbol(),
+    getRandomSymbol(),
+    getRandomSymbol(),
+  ]);
+  const [spinning, setSpinning] = useState(false);
+  const [winSound, setWinSound] = useState(null);
+  const [spinSound, setSpinSound] = useState(null);
+  const [gameOverSound, setGameOverSound] = useState(null);
+  const [bgMusic, setBgMusic] = useState(null);
+  
+  const [remainingRetries, setRemainingRetries] = useState(3);
+  const [statusMessage, setStatusMessage] = useState('');
+  const [userName, setUserName] = useState('');
+  const [isUserNameSet, setIsUserNameSet] = useState(false); // Has the user entered their name?
+  const [hasWon, setHasWon] = useState(false); // Has the player won?
+  
+  useEffect(() => {
+    // Create and set up audio elements.
+    const winAudio = new Audio('/win.wav');
+    const spinAudio = new Audio('/spin.wav');
+    const gameOverAudio = new Audio('/game-over.wav');
+    const introAudio = new Audio('/intro.wav'); // Use intro.wav for the initial screen.
+    introAudio.loop = true;
+    
+    setWinSound(winAudio);
+    setSpinSound(spinAudio);
+    setGameOverSound(gameOverAudio);
+    setBgMusic(introAudio);
+  }, []);
+
+  // Attach a one-time click listener to enable the intro audio after a user interaction.
+  useEffect(() => {
+    if (bgMusic && !isUserNameSet) {
+      const enableAudio = () => {
+        bgMusic.play().catch((err) =>
+          console.error('Intro audio play error:', err)
+        );
+        window.removeEventListener('click', enableAudio);
+      };
+      window.addEventListener('click', enableAudio);
+      return () => window.removeEventListener('click', enableAudio);
+    }
+  }, [bgMusic, isUserNameSet]);
+
+  const playWinSound = () => {
+    if (winSound) {
+      winSound.currentTime = 0;
+      winSound.play().catch((err) =>
+        console.error('Win sound play error:', err)
+      );
+    }
+  };
+
+  const playSpinSound = () => {
+    if (spinSound) {
+      spinSound.currentTime = 0;
+      spinSound.play().catch((err) =>
+        console.error('Spin sound play error:', err)
+      );
+    }
+  };
+
+  const spin = () => {
+    if (spinning || remainingRetries === 0) return;
+    
+    setSpinning(true);
+    setStatusMessage('Spinning...');
+    playSpinSound();
+    
+    // Calculate spin duration based on spinSound's duration (at least 1 second) multiplied by 800.
+    const spinDuration = Math.max(spinSound.duration, 1) * 800;
+    
+    const interval = setInterval(() => {
+      setReels([getRandomSymbol(), getRandomSymbol(), getRandomSymbol()]);
+    }, 100);
+    
+    setTimeout(() => {
+      clearInterval(interval);
+      setSpinning(false);
+      
+      let isWin = false;
+      
+      // Special condition: if the player's name is 'Nin', force a win.
+      if (userName === 'Nin') {
+        const winSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+        setReels([winSymbol, winSymbol, winSymbol]);
+        isWin = true;
+      } else {
+        // Check if all three reels have the same symbol.
+        isWin =
+          reels[0]?.name === reels[1]?.name &&
+          reels[1]?.name === reels[2]?.name;
+      }
+      
+      if (isWin) {
+        playWinSound();
+        setStatusMessage('Congratulations! You win!');
+        setHasWon(true);
+      } else {
+        setRemainingRetries((prev) => {
+          const updatedRetries = prev - 1;
+          if (updatedRetries === 0) {
+            if (gameOverSound) {
+              gameOverSound.currentTime = 0;
+              gameOverSound.play().catch((err) =>
+                console.error('Game over sound error:', err)
+              );
+            }
+            setStatusMessage('Game Over');
+          } else {
+            setStatusMessage('Try again?');
+          }
+          return updatedRetries;
+        });
+      }
+    }, spinDuration);
+  };
+
+  // handleQuit resets the game to the initial state (player name entry).
+  const handleQuit = () => {
+    if (bgMusic) {
+      bgMusic.pause();
+      bgMusic.currentTime = 0;
+    }
+    resetGame();
+  };
+
+  // handleNewGame resets the game after a win.
+  const handleNewGame = () => {
+    if (bgMusic) {
+      bgMusic.pause();
+      bgMusic.currentTime = 0;
+    }
+    resetGame();
+  };
+
+  // When the user submits their name, pause the intro audio and proceed.
+  const handleNameSubmit = (event) => {
+    event.preventDefault();
+    if (bgMusic) {
+      bgMusic.pause();
+      bgMusic.currentTime = 0;
+    }
+    setIsUserNameSet(true);
+  };
+
+  // Reset game state back to its initial values.
+  const resetGame = () => {
+    setRemainingRetries(3);
+    setReels([getRandomSymbol(), getRandomSymbol(), getRandomSymbol()]);
+    setStatusMessage('');
+    setUserName('');
+    setIsUserNameSet(false);
+    setHasWon(false);
+  };
+
+  return (
+    <div className="relative flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
+      {/* Top right "Quit" control (only on game screen) */}
+      {isUserNameSet && (
+        <button
+          onClick={handleQuit}
+          className="absolute top-4 right-4 text-white text-3xl focus:outline-none"
+          aria-label="Quit Game"
+        >
+          &times;
+        </button>
+      )}
+      {!isUserNameSet ? (
+        // Initial player name entry screen with intro audio playing.
+        <div className="flex flex-col items-center justify-center space-y-4">
+          <h1 className="text-4xl font-bold mb-6">Enter Player Name</h1>
+          <form
+            onSubmit={handleNameSubmit}
+            className="flex flex-col items-center"
+          >
+            <input
+              type="text"
+              value={userName}
+              required
+              onChange={(e) => setUserName(e.target.value)}
+              placeholder="Player One"
+              className="mb-4 p-2 text-black rounded-lg bg-white text-center"
+            />
+            <button
+              type="submit"
+              className="px-6 py-3 bg-yellow-500 text-black rounded-xl shadow-lg text-lg font-bold hover:bg-yellow-400 transition-all duration-300"
+            >
+              Start Game
+            </button>
+          </form>
+        </div>
+      ) : (
+        // Game screen.
+        <>
+          <h1 className="text-4xl font-bold mb-6">Slot Machine</h1>
+          <h3 className="text-2xl font-bold mb-6">Player: {userName}</h3>
+          <div className="flex space-x-4 bg-gray-700 p-6 rounded-lg shadow-lg border-4 border-yellow-500">
+            {reels.map((reel, index) => (
+              <motion.div
+                key={index}
+                className="text-6xl"
+                animate={{ rotate: spinning ? 360 : 0 }}
+                transition={spinning ? { duration: 2, ease: 'easeInOut' } : { duration: 0 }}
+              >
+                {reel ? reel.icon : <span className="opacity-50">?</span>}
+              </motion.div>
+            ))}
+          </div>
+          <div className="mt-6">
+            {hasWon ? (
+              <button
+                onClick={handleNewGame}
+                disabled={spinning}
+                className="px-6 py-3 bg-yellow-500 text-black rounded-xl shadow-lg text-lg font-bold hover:bg-yellow-400 transition-all duration-300 disabled:opacity-50"
+              >
+                New Game
+              </button>
+            ) : remainingRetries > 0 ? (
+              <button
+                onClick={spin}
+                disabled={spinning}
+                className="px-6 py-3 bg-yellow-500 text-black rounded-xl shadow-lg text-lg font-bold hover:bg-yellow-400 transition-all duration-300 disabled:opacity-50"
+              >
+                {spinning ? 'Spinning...' : `Spin (${remainingRetries} left)`}
+              </button>
+            ) : (
+              <div className="px-6 py-3 bg-gray-500 rounded-xl text-lg font-bold">
+                Game Over
+              </div>
+            )}
+          </div>
+          {statusMessage && <p className="mt-4 text-lg">{statusMessage}</p>}
+        </>
+      )}
+      {hasWon && <Confetti />}
+    </div>
+  );
+};
+
+export default SlotMachine;
