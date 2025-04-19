@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "7Pm4HstU3C6IzGfxsdVoA5xt4pdG+k42Eo/QZT35Cyo=",
+  "Source": "SlotMachine.API",
+  "BasePath": "_content/SlotMachine.API",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

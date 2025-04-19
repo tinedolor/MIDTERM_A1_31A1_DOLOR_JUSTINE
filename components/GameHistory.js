@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { FaSignOutAlt } from 'react-icons/fa';
+import { FaSignOutAlt, FaSync } from 'react-icons/fa';
 
 export default function GameHistory() {
   const router = useRouter();
@@ -31,26 +31,48 @@ export default function GameHistory() {
     if (!studentNumber) return;
 
     const fetchHistory = async () => {
+      setLoading(true);
+      setError(null);
+      
       try {
         const res = await fetch(
-          `http://localhost:5260/api/Players/${studentNumber}/game-history/summary`
+          `http://localhost:5260/api/Players/${studentNumber}/game-history/summary`,
+          {
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            }
+          }
         );
 
+        // Handle HTTP errors
         if (!res.ok) {
-          throw new Error(`API returned status ${res.status}`);
+          const errorData = await res.json().catch(() => ({}));
+          throw new Error(
+            errorData.message || 
+            `Request failed with status ${res.status}: ${res.statusText}`
+          );
         }
 
         const data = await res.json();
+        
+        // Validate response structure
+        if (!data || typeof data !== 'object') {
+          throw new Error('Invalid response format from server');
+        }
+
+        // Transform data with proper error handling
         const transformedData = {
-          totalGames: data.totalGames || 0,
-          wins: data.wins || 0,
-          losses: data.losses || 0,
-          winPercentage: data.winPercentage ? parseFloat(data.winPercentage.toFixed(1)) : 0,
+          totalGames: Number(data.totalGames) || 0,
+          wins: Number(data.wins) || 0,
+          losses: Number(data.losses) || 0,
+          winPercentage: data.winPercentage ? 
+            parseFloat(Number(data.winPercentage).toFixed(1)) : 0,
           recentGames: Array.isArray(data.recentGames) 
             ? data.recentGames.map(game => ({
                 playedAt: game.playedAt ? new Date(game.playedAt) : new Date(),
-                result: game.result || 'Unknown',
-                retriesUsed: game.retriesUsed || 0,
+                result: typeof game.result === 'string' ? game.result : 'Unknown',
+                retriesUsed: Number(game.retriesUsed) || 0,
                 status: game.result === "Win" ? "Won" : `Retries: ${game.retriesUsed || 0}`
               }))
             : []
@@ -60,6 +82,11 @@ export default function GameHistory() {
       } catch (err) {
         console.error("Failed to fetch game history:", err);
         setError(err.message || "Failed to load game history");
+        
+        // Log additional error details for debugging
+        if (err.response) {
+          console.error("Response error:", await err.response.text());
+        }
       } finally {
         setLoading(false);
       }
@@ -71,7 +98,13 @@ export default function GameHistory() {
   const retryFetch = () => {
     setLoading(true);
     setError(null);
-    setStudentNumber(localStorage.getItem('studentNumber') || '');
+    const storedNumber = localStorage.getItem('studentNumber');
+    if (storedNumber) {
+      setStudentNumber(storedNumber);
+    } else {
+      setError("No student number found - please login again");
+      setLoading(false);
+    }
   };
 
   const handleLogout = () => {
@@ -94,6 +127,7 @@ export default function GameHistory() {
           <button 
             onClick={handleLogout}
             className="logout-button"
+            aria-label="Logout"
           >
             <FaSignOutAlt /> Logout
           </button>
@@ -102,17 +136,29 @@ export default function GameHistory() {
 
       {loading ? (
         <div className="loading-spinner">
-          <div className="spinner" />
+          <div className="spinner" aria-label="Loading" />
           <p>Loading game history...</p>
         </div>
       ) : error ? (
         <div className="error-message">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <h3>Error</h3>
+          <div className="error-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h3>Error Loading Data</h3>
           <p>{error}</p>
-          <button onClick={retryFetch} className="retry-button">Retry</button>
+          <div className="error-actions">
+            <button onClick={retryFetch} className="retry-button">
+              <FaSync /> Try Again
+            </button>
+            <button 
+              onClick={handleLogout} 
+              className="secondary-button"
+            >
+              Return to Login
+            </button>
+          </div>
         </div>
       ) : (
         <>
@@ -339,12 +385,6 @@ export default function GameHistory() {
           gap: 0.5rem;
         }
 
-        .no-games svg {
-          width: 2rem;
-          height: 2rem;
-          color: #b0b0b0;
-        }
-
         .loading-spinner {
           text-align: center;
           padding: 2rem;
@@ -380,7 +420,7 @@ export default function GameHistory() {
           border-radius: 8px;
         }
 
-        .error-message svg {
+        .error-icon svg {
           width: 40px;
           height: 40px;
         }
@@ -393,9 +433,20 @@ export default function GameHistory() {
         .error-message p {
           margin: 0;
           color: #f0f0f0;
+          max-width: 80%;
+          word-break: break-word;
+        }
+
+        .error-actions {
+          display: flex;
+          gap: 1rem;
+          margin-top: 1rem;
         }
 
         .retry-button {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
           padding: 0.5rem 1rem;
           background: #f44336;
           color: white;
@@ -409,6 +460,20 @@ export default function GameHistory() {
           background: #d32f2f;
         }
 
+        .secondary-button {
+          padding: 0.5rem 1rem;
+          background: transparent;
+          color: #f0f0f0;
+          border: 1px solid #f0f0f0;
+          border-radius: 4px;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .secondary-button:hover {
+          background: rgba(255, 255, 255, 0.1);
+        }
+
         @media (max-width: 768px) {
           .header-section {
             flex-direction: column;
@@ -418,6 +483,21 @@ export default function GameHistory() {
           .header-actions {
             width: 100%;
             justify-content: space-between;
+          }
+
+          .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+
+          .error-actions {
+            flex-direction: column;
+            width: 100%;
+          }
+
+          .retry-button,
+          .secondary-button {
+            width: 100%;
+            justify-content: center;
           }
         }
       `}</style>

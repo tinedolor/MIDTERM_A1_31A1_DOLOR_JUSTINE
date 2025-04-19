@@ -1,9 +1,10 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FaStar, FaGem, FaHeart, FaLaptopCode, FaQuestion, FaSignOutAlt } from 'react-icons/fa';
+import { FaStar, FaGem, FaHeart, FaLaptopCode, FaQuestion, FaSignOutAlt, FaHistory } from 'react-icons/fa';
 import ProtectedRoute from '../../components/ProtectedRoute';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 // Spinning messages array
 const spinningMessages = [
@@ -320,7 +321,7 @@ export default function GamePage() {
   return (
     <ProtectedRoute>
       <div className="relative flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white p-4">
-        {/* Header with student info and logout */}
+        {/* Header with student info and actions */}
         <div className="absolute top-4 right-4 flex gap-4 items-center">
           <div className="bg-blue-600 px-4 py-2 rounded-lg">
             Student: {studentNumber || 'Unknown'}
@@ -328,6 +329,16 @@ export default function GamePage() {
           <div className="bg-green-600 px-4 py-2 rounded-lg">
             Wins: {winCount} | Losses: {lossCount}
           </div>
+          
+          {/* Game History Button */}
+          <Link
+            href="/history"
+            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-white transition-colors flex items-center gap-2"
+          >
+            <FaHistory /> History
+          </Link>
+          
+          {/* Logout Button */}
           <button
             onClick={handleLogout}
             className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-white transition-colors flex items-center gap-2"
