@@ -34,4 +34,4 @@ dotnet ef database update
 dotnet run
 ```
 ## Database Setup
-Run the SQL scripts in `database/` or use EF Core migrations.
+Use EF Core migrations.
